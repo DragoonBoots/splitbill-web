@@ -5,6 +5,8 @@ import React from "react";
 import {FieldArray, Form, Formik} from "formik";
 import {DateTime} from "luxon";
 import PeopleForm from "./PeopleForm";
+import {Bill, BillLine} from "./calculator/calculator";
+import currency from "currency.js";
 
 const initialValues = {
     lines: [
@@ -28,6 +30,25 @@ const initialValues = {
 };
 
 class App extends React.Component {
+    constructor(props) {
+        super(props);
+
+        this.handleSubmit = this.handleSubmit.bind(this);
+    }
+
+    handleSubmit(values) {
+        const bill = new Bill();
+        for (const line of values.lines) {
+            const billLine = new BillLine();
+            billLine.name = line.name;
+            billLine.amount = new currency(line.amount);
+            billLine.taxRate = line.tax;
+            billLine.split = line.usage;
+            bill.lines.push(billLine);
+        }
+        const result = bill.calculate();
+    }
+
     render() {
         return (
             <div>
@@ -37,10 +58,7 @@ class App extends React.Component {
                 <Container>
                     <Formik
                         initialValues={initialValues}
-                        onSubmit={async (values) => {
-                            await new Promise((r) => setTimeout(r, 500));
-                            alert(JSON.stringify(values, null, 2));
-                        }}
+                        onSubmit={this.handleSubmit}
                     >
                         {({values}) => (
                             <div>

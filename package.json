@@ -9,6 +9,7 @@
     "@wojtekmaj/react-daterange-picker": "^3.0.0",
     "bootstrap": "^4.5.3",
     "bootstrap-icons": "^1.3.0",
+    "currency.js": "^2.0.3",
     "formik": "^2.2.6",
     "jquery": "^3.5.1",
     "luxon": "^1.25.0",
@@ -23,7 +24,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test",
+    "test": "jest",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
