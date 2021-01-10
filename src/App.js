@@ -1,21 +1,33 @@
 import './style/App.scss';
-import {Col, Container, Navbar, Row} from "react-bootstrap";
+import {Button, Col, Container, Navbar, Row} from "react-bootstrap";
 import BillLinesForm from "./BillLinesForm";
 import React from "react";
+import {FieldArray, Form, Formik} from "formik";
+import {DateTime} from "luxon";
 import PeopleForm from "./PeopleForm";
 
+const initialValues = {
+    lines: [
+        {
+            name: '',
+            amount: 0,
+            tax: 0,
+            usage: true,
+        },
+    ],
+    people: [
+        {
+            name: '',
+            dateRange: [
+                // Initialize to a range starting 1 month prior to today
+                DateTime.local().minus({months: 1}).toJSDate(),
+                DateTime.local().toJSDate()
+            ]
+        },
+    ],
+};
+
 class App extends React.Component {
-    constructor(props) {
-        super(props);
-
-        this.handleSubmit = this.handleSubmit.bind(this);
-    }
-
-
-    handleSubmit(e) {
-
-    }
-
     render() {
         return (
             <div>
@@ -23,24 +35,46 @@ class App extends React.Component {
                     <Navbar.Brand>Split Bill</Navbar.Brand>
                 </Navbar>
                 <Container>
-                    <Row>
-                        <Col>
-                            <h1>People</h1>
-                            <PeopleForm/>
-                        </Col>
-                    </Row>
-                    <Row>
-                        <Col>
-                            <h1>Lines</h1>
-                            <BillLinesForm onSubmit={this.handleSubmit()}/>
-                        </Col>
-                    </Row>
-                    <Row>
-                        <Col>
-                            <h1>Results</h1>
-                            <p>Split results</p>
-                        </Col>
-                    </Row>
+                    <Formik
+                        initialValues={initialValues}
+                        onSubmit={async (values) => {
+                            await new Promise((r) => setTimeout(r, 500));
+                            alert(JSON.stringify(values, null, 2));
+                        }}
+                    >
+                        {({values}) => (
+                            <div>
+                                <Form>
+                                    <Row>
+                                        <Col>
+                                            <h1>People</h1>
+                                            <FieldArray name="people"
+                                                        render={arrayHelpers => (
+                                                            <PeopleForm values={values} arrayHelpers={arrayHelpers}/>
+                                                        )}
+                                            />
+                                        </Col>
+                                    </Row>
+                                    <Row>
+                                        <Col>
+                                            <h1>Lines</h1>
+                                            <FieldArray name="lines"
+                                                        render={arrayHelpers => (
+                                                            <BillLinesForm values={values} arrayHelpers={arrayHelpers}/>
+                                                        )}
+                                            />
+                                        </Col>
+                                    </Row>
+                                    <Row>
+                                        <Col>
+                                            <h1>Results</h1>
+                                            <p><Button variant="primary" type="submit">Calculate</Button></p>
+                                        </Col>
+                                    </Row>
+                                </Form>
+                            </div>
+                        )}
+                    </Formik>
                 </Container>
             </div>
         );

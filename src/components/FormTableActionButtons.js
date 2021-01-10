@@ -61,7 +61,7 @@ export function FormTableActionButtons(props) {
                 onClick={() => props.arrayHelpers.move(props.index, props.index + 1)}
             />
             <AddButton
-                onClick={() => props.arrayHelpers.insert(props.index + 1, props.initialValues)}
+                onClick={() => props.arrayHelpers.insert(props.index + 1, props.values[props.index])}
             />
             <RemoveButton
                 disabled={props.values.length === 1}

@@ -1,88 +1,108 @@
 import React from 'react';
-import {Button, Form as BsForm, InputGroup, Table} from "react-bootstrap";
-import {ErrorMessage, Field, FieldArray, Form, Formik} from 'formik';
+import {Form as BsForm, InputGroup, Table} from "react-bootstrap";
+import {ErrorMessage, Field} from 'formik';
 import FormTableActionButtons from "./components/FormTableActionButtons";
 
-const initialValues = {
-    lines: [
-        {
-            name: '',
-            amount: 0,
-            tax: 0,
-            usage: true,
-        },
-    ],
-};
+function NameField(props) {
+    return (
+        <div>
+            <Field
+                as={BsForm.Control}
+                name={`lines.${props.index}.name`}
+                type="text"
+            />
+            <ErrorMessage
+                name={`lines.${props.index}.name`}
+                component="div"
+                className="field-error"
+            />
+        </div>
+    );
+}
 
-function BillLines(props) {
+function AmountField(props) {
+    return (
+        <div>
+            <InputGroup>
+                <InputGroup.Prepend>
+                    <InputGroup.Text>$</InputGroup.Text>
+                </InputGroup.Prepend>
+                <Field
+                    as={BsForm.Control}
+                    name={`lines.${props.index}.amount`}
+                    type="number"
+                    min="0"
+                    step="0.01"
+                />
+            </InputGroup>
+            <ErrorMessage
+                name={`lines.${props.index}.amount`}
+                component="div"
+                className="field-error"
+            />
+        </div>
+    );
+}
+
+function TaxRateField(props) {
+    return (
+        <div>
+            <InputGroup>
+                <Field
+                    as={BsForm.Control}
+                    name={`lines.${props.index}.tax`}
+                    type="number"
+                    min="0"
+                    step="0.001"
+                />
+                <InputGroup.Append>
+                    <InputGroup.Text>%</InputGroup.Text>
+                </InputGroup.Append>
+            </InputGroup>
+            <ErrorMessage
+                name={`lines.${props.index}.tax`}
+                component="div"
+                className="field-error"
+            />
+        </div>
+    );
+}
+
+function IsUsageField(props) {
+    return (
+        <div>
+            <Field
+                as={BsForm.Check}
+                // id needed for Bootstrap control to function
+                id={`lines.${props.index}.usage`}
+                name={`lines.${props.index}.usage`}
+                type="switch"
+            />
+            <ErrorMessage
+                name={`lines.${props.index}.usage`}
+                component="div"
+                className="field-error"
+            />
+        </div>
+    );
+}
+
+export function BillLinesForm(props) {
     const lines = props.values.lines.map((line, index) => (
         <tr key={index}>
             <td>
-                {/* Name */}
-                <Field
-                    as={BsForm.Control}
-                    name={`lines.${index}.name`}
-                    type="text"
-                />
-                <ErrorMessage
-                    name={`lines.${index}.name`}
-                    component="div"
-                    className="field-error"
-                />
+                <NameField index={index}/>
             </td>
             <td>
-                {/* Amount */}
-                <InputGroup>
-                    <InputGroup.Prepend>
-                        <InputGroup.Text>$</InputGroup.Text>
-                    </InputGroup.Prepend>
-                    <Field
-                        as={BsForm.Control}
-                        name={`lines.${index}.amount`}
-                        type="number"
-                        min="0"
-                        step="0.01"
-                    />
-                </InputGroup>
-                <ErrorMessage
-                    name={`lines.${index}.amount`}
-                    component="div"
-                    className="field-error"
-                />
+                <AmountField index={index}/>
             </td>
             <td>
                 {/* Tax rate */}
-                <InputGroup>
-                    <Field
-                        as={BsForm.Control}
-                        name={`lines.${index}.tax`}
-                        type="number"
-                        min="0"
-                        step="0.001"
-                    />
-                    <InputGroup.Append>
-                        <InputGroup.Text>%</InputGroup.Text>
-                    </InputGroup.Append>
-                </InputGroup>
-                <ErrorMessage
-                    name={`lines.${index}.tax`}
-                    component="div"
-                    className="field-error"
-                />
+                <TaxRateField index={index}/>
             </td>
             <td>
                 {/* Is usage? */}
-                <Field
-                    as={BsForm.Check}
-                    id={`lines.${index}.usage`}
-                    name={`lines.${index}.usage`}
-                    type="switch"
-                />
-                <ErrorMessage
-                    name={`lines.${index}.usage`}
-                    component="div"
-                    className="field-error"
-                />
+                <IsUsageField index={index}/>
             </td>
             <td>
                 {/* Actions */}
@@ -90,7 +110,6 @@ function BillLines(props) {
                     index={index}
                     values={props.values.lines}
                     arrayHelpers={props.arrayHelpers}
-                    initialValues={initialValues.lines[0]}
                 />
             </td>
         </tr>
@@ -113,33 +132,6 @@ function BillLines(props) {
             </Table>
         </div>
     );
-}
-
-class BillLinesForm extends React.Component {
-    render() {
-        return (
-            <div>
-                <Formik
-                    initialValues={initialValues}
-                    onSubmit={async (values) => {
-                        await new Promise((r) => setTimeout(r, 500));
-                        alert(JSON.stringify(values, null, 2));
-                    }}
-                >
-                    {({values}) => (
-                        <Form>
-                            <FieldArray name="lines"
-                                        render={arrayHelpers => (
-                                            <BillLines values={values} arrayHelpers={arrayHelpers}/>
-                                        )}
-                            />
-                            <Button variant="primary" type="submit">Calculate</Button>
-                        </Form>
-                    )}
-                </Formik>
-            </div>
-        );
-    }
 }
 
 export default BillLinesForm;

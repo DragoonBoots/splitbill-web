@@ -1,52 +1,55 @@
 import React from 'react';
 import {Form as BsForm, Table} from "react-bootstrap";
-import {ErrorMessage, Field, FieldArray, Form, Formik} from 'formik';
+import {ErrorMessage, Field} from 'formik';
 import FormTableActionButtons from "./components/FormTableActionButtons";
 import {DateTime} from "luxon";
 import DateRangePicker from "./components/DateRangePickerField"
 
-const initialValues = {
-    people: [
-        {
-            name: '',
-            dateRange: [
-                DateTime.local().minus({months: 1}).toJSDate(),
-                DateTime.local().toJSDate()
-            ]
-        },
-    ],
-};
+function NameField(props) {
+    return (
+        <div>
+            <Field
+                as={BsForm.Control}
+                name={`people.${props.index}.name`}
+                type="text"
+            />
+            <ErrorMessage
+                name={`people.${props.index}.name`}
+                component="div"
+                className="field-error"
+            />
+        </div>
+    );
+}
 
-function People(props) {
+function DateRangeField(props) {
+    return (
+        <div>
+            <Field
+                as={DateRangePicker}
+                name={`people.${props.index}.dateRange`}
+                maxDate={DateTime.local().toJSDate()}
+                calendarIcon={<i className="bi-calendar-range-fill"/>}
+                clearIcon={null}
+            />
+            <ErrorMessage
+                name={`people.${props.index}.start`}
+                component="div"
+                className="field-error"
+            />
+        </div>
+    );
+}
+
+export function PeopleForm(props) {
     const people = props.values.people.map((person, index) => (
         <tr key={index}>
             <td>
-                {/* Name */}
-                <Field
-                    as={BsForm.Control}
-                    name={`people.${index}.name`}
-                    type="text"
-                />
-                <ErrorMessage
-                    name={`people.${index}.name`}
-                    component="div"
-                    className="field-error"
-                />
+                <NameField index={index}/>
             </td>
             <td>
                 {/* Date range */}
-                <Field
-                    as={DateRangePicker}
-                    name={`people.${index}.dateRange`}
-                    maxDate={DateTime.local().toJSDate()}
-                    calendarIcon={<i className="bi-calendar-range-fill"/>}
-                    clearIcon={null}
-                />
-                <ErrorMessage
-                    name={`people.${index}.start`}
-                    component="div"
-                    className="field-error"
-                />
+                <DateRangeField index={index}/>
             </td>
             <td>
                 {/* Actions */}
@@ -54,7 +57,6 @@ function People(props) {
                     index={index}
                     values={props.values.people}
                     arrayHelpers={props.arrayHelpers}
-                    initialValues={initialValues.people[0]}
                 />
             </td>
         </tr>
@@ -75,32 +77,6 @@ function People(props) {
             </Table>
         </div>
     );
-}
-
-class PeopleForm extends React.Component {
-    render() {
-        return (
-            <div>
-                <Formik
-                    initialValues={initialValues}
-                    onSubmit={async (values) => {
-                        await new Promise((r) => setTimeout(r, 500));
-                        alert(JSON.stringify(values, null, 2));
-                    }}
-                >
-                    {({values}) => (
-                        <Form>
-                            <FieldArray name="people"
-                                        render={arrayHelpers => (
-                                            <People values={values} arrayHelpers={arrayHelpers}/>
-                                        )}
-                            />
-                        </Form>
-                    )}
-                </Formik>
-            </div>
-        );
-    }
 }
 
 export default PeopleForm;
