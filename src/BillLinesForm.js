@@ -1,6 +1,7 @@
 import React from 'react';
-import {Button, ButtonGroup, Form as BsForm, InputGroup, Table} from "react-bootstrap";
-import {Formik, Field, Form, ErrorMessage, FieldArray} from 'formik';
+import {Button, Form as BsForm, InputGroup, Table} from "react-bootstrap";
+import {ErrorMessage, Field, FieldArray, Form, Formik} from 'formik';
+import FormTableActionButtons from "./components/FormTableActionButtons";
 
 const initialValues = {
     lines: [
@@ -12,58 +13,6 @@ const initialValues = {
         },
     ],
 };
-
-function UpButton(props) {
-    return (
-        <Button
-            variant="outline-secondary"
-            disabled={props.disabled ?? false}
-            onClick={props.onClick}
-        >
-            <span className="sr-only">Move up</span>
-            <i className="bi-arrow-up-circle-fill"/>
-        </Button>
-    );
-}
-
-function DownButton(props) {
-    return (
-        <Button
-            variant="outline-secondary"
-            disabled={props.disabled ?? false}
-            onClick={props.onClick}
-        >
-            <span className="sr-only">Move down</span>
-            <i className="bi-arrow-down-circle-fill"/>
-        </Button>
-    );
-}
-
-function AddButton(props) {
-    return (
-        <Button
-            variant="outline-success"
-            disabled={props.disabled ?? false}
-            onClick={props.onClick}
-        >
-            <span className="sr-only">Insert above</span>
-            <i className="bi-plus-circle-fill"/>
-        </Button>
-    );
-}
-
-function RemoveButton(props) {
-    return (
-        <Button
-            variant="outline-danger"
-            disabled={props.disabled ?? false}
-            onClick={props.onClick}
-        >
-            <span className="sr-only">Remove</span>
-            <i className="bi-x-circle-fill"/>
-        </Button>
-    );
-}
 
 function BillLines(props) {
     const lines = props.values.lines.map((line, index) => (
@@ -137,23 +86,12 @@ function BillLines(props) {
             </td>
             <td>
                 {/* Actions */}
-                <ButtonGroup>
-                    <UpButton
-                        disabled={index === 0}
-                        onClick={() => props.arrayHelpers.move(index, index - 1)}
-                    />
-                    <DownButton
-                        disabled={index === props.values.lines.length - 1}
-                        onClick={() => props.arrayHelpers.move(index, index + 1)}
-                    />
-                    <AddButton
-                        onClick={() => props.arrayHelpers.insert(index, initialValues.lines[0])}
-                    />
-                    <RemoveButton
-                        disabled={props.values.lines.length === 1}
-                        onClick={() => props.arrayHelpers.remove(index)}
-                    />
-                </ButtonGroup>
+                <FormTableActionButtons
+                    index={index}
+                    values={props.values.lines}
+                    arrayHelpers={props.arrayHelpers}
+                    initialValues={initialValues.lines[0]}
+                />
             </td>
         </tr>
     ));
