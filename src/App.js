@@ -46,7 +46,7 @@ class App extends React.Component {
             billLine.split = line.usage;
             bill.lines.push(billLine);
         }
-        const result = bill.calculate();
+        const total = bill.total();
     }
 
     render() {

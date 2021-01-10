@@ -39,7 +39,7 @@ afterEach(() => {
 });
 
 test('Toted properly', () => {
-    const totals = bill.calculate();
+    const totals = bill.total();
 
     expect(totals.generalTotal).toEqual(currency(64.07));
     expect(totals.usageTotal).toEqual(currency(84.77));
