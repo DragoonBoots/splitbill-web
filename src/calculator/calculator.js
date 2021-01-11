@@ -1,5 +1,12 @@
 import currency from "currency.js"
 
+export class PersonPeriod {
+    constructor(name, period) {
+        this.name = name;
+        this.period = period;
+    }
+}
+
 export class BillLine {
     constructor() {
         this.name = '';
@@ -13,6 +20,17 @@ export class SplitBill {
     constructor(usageTotal, generalTotal) {
         this.usageTotal = usageTotal;
         this.generalTotal = generalTotal;
+    }
+
+    total() {
+        return this.usageTotal.add(this.generalTotal);
+    }
+}
+
+export class BillPortion extends SplitBill {
+    constructor(name, usageTotal, generalTotal) {
+        super(usageTotal, generalTotal);
+        this.name = name;
     }
 }
 
@@ -66,5 +84,70 @@ export class Bill {
 
         // Placeholder
         return new SplitBill(usageTotal, generalTotal);
+    }
+
+    split(period, personPeriods, names) {
+        if (names.length === 0) {
+            return [];
+        }
+
+        const totals = this.total();
+        // How much money presence on a certain day costs
+        const usagePart = totals.usageTotal.divide(period.length('days'));
+        const periodDays = Array.from(function* () {
+            for (let offset = 0; offset < period.length('days'); ++offset) {
+                yield period.start.plus({'days': offset});
+            }
+        }());
+
+        // First pass: Determine how many parts each day must be split into.
+        const dayParts = new Map();
+        // Days where no person was present, so usage shall be distributed evenly.
+        let everyoneUsageDays = 0;
+        for (const day of periodDays) {
+            let dayPartCount = 0;
+            for (const personPeriod of personPeriods) {
+                if (personPeriod.period.contains(day)) {
+                    dayPartCount++;
+                }
+            }
+            if (dayPartCount === 0) {
+                dayPartCount = names.length;
+                everyoneUsageDays++;
+            }
+            dayParts.set(day, dayPartCount);
+        }
+
+        // Everyone will have this amount added to their usage portion to account for days when no one was present.
+        const everyoneUsageAmount = usagePart.divide(names.length).multiply(everyoneUsageDays);
+
+        // Second pass: divide the amount into chunks for each day, then divide those chunks into parts for
+        // each user present on that day.  The end result of this is that presence on a given day costs a
+        // certain amount.
+        const dayUsageAmounts = new Map();
+        for (const day of periodDays) {
+            dayUsageAmounts.set(day, usagePart.divide(dayParts.get(day)));
+        }
+
+        // Third pass: total each user's contribution.
+        const generalPortion = totals.generalTotal.divide(names.length);
+        const portions = [];
+        for (const person of names) {
+            let usagePortion = currency(0).add(everyoneUsageAmount);
+            for (const personPeriod of personPeriods) {
+                if (personPeriod.name !== person) {
+                    continue;
+                }
+                for (const day of periodDays) {
+                    if (!personPeriod.period.contains(day)) {
+                        continue;
+                    }
+                    usagePortion = usagePortion.add(dayUsageAmounts.get(day));
+                }
+            }
+            portions.push(new BillPortion(person, usagePortion, generalPortion));
+        }
+
+        return portions;
     }
 }
