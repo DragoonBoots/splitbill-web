@@ -1,6 +1,6 @@
 import {Bill, BillLine, PersonPeriod} from "./calculator";
-import currency from "currency.js";
 import {DateTime, Interval} from "luxon";
+import Big from "big.js";
 
 let bill = null;
 beforeEach(() => {
@@ -8,28 +8,28 @@ beforeEach(() => {
 
     const lineUnsplitTaxed = new BillLine();
     lineUnsplitTaxed.name = "Unsplit, taxed";
-    lineUnsplitTaxed.amount = currency(30.95);
+    lineUnsplitTaxed.amount = new Big(30.95);
     lineUnsplitTaxed.split = false;
     lineUnsplitTaxed.taxRate = 0.07;
     bill.lines.push(lineUnsplitTaxed);
 
     const lineUnsplitUntaxed = new BillLine();
     lineUnsplitUntaxed.name = "Unsplit, untaxed";
-    lineUnsplitUntaxed.amount = currency(30.95);
+    lineUnsplitUntaxed.amount = new Big(30.95);
     lineUnsplitUntaxed.split = false;
     lineUnsplitUntaxed.taxRate = 0;
     bill.lines.push(lineUnsplitUntaxed);
 
     const lineSplitTaxed = new BillLine();
     lineSplitTaxed.name = "Split, taxed";
-    lineSplitTaxed.amount = currency(40.95);
+    lineSplitTaxed.amount = new Big(40.95);
     lineSplitTaxed.split = true;
     lineSplitTaxed.taxRate = 0.07;
     bill.lines.push(lineSplitTaxed);
 
     const lineSplitUntaxed = new BillLine();
     lineSplitUntaxed.name = "Split, untaxed";
-    lineSplitUntaxed.amount = currency(40.95);
+    lineSplitUntaxed.amount = new Big(40.95);
     lineSplitUntaxed.split = true;
     lineSplitUntaxed.taxRate = 0;
     bill.lines.push(lineSplitUntaxed);
@@ -40,9 +40,9 @@ afterEach(() => {
 });
 
 function _accumulate(currencies) {
-    let total = currency(0);
+    let total = new Big(0);
     for (const item of currencies) {
-        total = total.add(item);
+        total = total.plus(item);
     }
     return total;
 }
@@ -50,9 +50,9 @@ function _accumulate(currencies) {
 test('Toted properly', () => {
     const totals = bill.total();
 
-    expect(totals.generalTotal).toEqual(currency(64.07));
-    expect(totals.usageTotal).toEqual(currency(84.77));
-    expect(totals.total()).toEqual(currency(148.84));
+    expect(totals.generalTotal.round(2)).toEqual(new Big(64.07));
+    expect(totals.usageTotal.round(2)).toEqual(new Big(84.77));
+    expect(totals.total().round(2)).toEqual(new Big(148.83));
 });
 
 
@@ -103,14 +103,14 @@ test('Split properly', () => {
         portions.get(personOneWeekName).total(),
         portions.get(personTwoWeeksName).total(),
         portions.get(personAbsentName).total(),
-    ])).toEqual(currency(148.83));
-    expect(portions.get(personOneWeekName).usageTotal).toEqual(currency(26.89));
-    expect(portions.get(personOneWeekName).generalTotal).toEqual(currency(21.36));
-    expect(portions.get(personOneWeekName).total()).toEqual(currency(48.25));
-    expect(portions.get(personTwoWeeksName).usageTotal).toEqual(currency(43.30));
-    expect(portions.get(personTwoWeeksName).generalTotal).toEqual(currency(21.36));
-    expect(portions.get(personTwoWeeksName).total()).toEqual(currency(64.65));
-    expect(portions.get(personAbsentName).usageTotal).toEqual(currency(14.58));
-    expect(portions.get(personAbsentName).generalTotal).toEqual(currency(21.36));
-    expect(portions.get(personAbsentName).total()).toEqual(currency(35.94));
+    ]).round(2)).toEqual(new Big(148.83));
+    expect(portions.get(personOneWeekName).usageTotal.round(2)).toEqual(new Big(26.89));
+    expect(portions.get(personOneWeekName).generalTotal.round(2)).toEqual(new Big(21.36));
+    expect(portions.get(personOneWeekName).total().round(2)).toEqual(new Big(48.24));
+    expect(portions.get(personTwoWeeksName).usageTotal.round(2)).toEqual(new Big(43.29));
+    expect(portions.get(personTwoWeeksName).generalTotal.round(2)).toEqual(new Big(21.36));
+    expect(portions.get(personTwoWeeksName).total().round(2)).toEqual(new Big(64.65));
+    expect(portions.get(personAbsentName).usageTotal.round(2)).toEqual(new Big(14.58));
+    expect(portions.get(personAbsentName).generalTotal.round(2)).toEqual(new Big(21.36));
+    expect(portions.get(personAbsentName).total().round(2)).toEqual(new Big(35.94));
 });
