@@ -98,6 +98,7 @@ class App extends React.Component {
 
     handleCalculate(values) {
         const bill = new Bill();
+        bill.totalAmount = new Big(values.bill.total);
         for (const line of values.lines) {
             const billLine = new BillLine();
             billLine.name = line.name;

@@ -37,6 +37,7 @@ export class BillPortion extends SplitBill {
 export class Bill {
     constructor() {
         this.lines = [];
+        this.totalAmount = new Big(0);
     }
 
     static _applyTax(lines) {
@@ -149,5 +150,17 @@ export class Bill {
         }
 
         return portions;
+    }
+
+    valid() {
+        // Check line total equals bill total, with tax applied
+        const totals = this.total();
+        const errorMargin = 0.001;
+        if (totals.total().minus(this.totalAmount).abs().round(2).gte(errorMargin)) {
+            return 'Bill total not equal to the sum of the lines.';
+        }
+
+        // Valid
+        return '';
     }
 }

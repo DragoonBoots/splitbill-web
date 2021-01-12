@@ -116,3 +116,13 @@ test('Split properly', () => {
     expect(portions.get(personAbsentName).generalTotal.round(2)).toEqual(new Big(21.36));
     expect(portions.get(personAbsentName).total().round(2)).toEqual(new Big(35.94));
 });
+
+test('validate a valid bill', () => {
+    bill.totalAmount = new Big(148.83);
+    expect(bill.valid()).toBe('');
+});
+
+test('validate an invalid bill', () => {
+    bill.totalAmount = new Big(150.00);
+    expect(bill.valid()).toBe('Bill total not equal to the sum of the lines.');
+})
