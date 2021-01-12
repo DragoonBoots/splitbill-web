@@ -73,10 +73,10 @@ function IsUsageField(props) {
         <div>
             <Field
                 as={BsForm.Check}
+                type="checkbox"
                 // id needed for Bootstrap control to function
                 id={`lines.${props.index}.usage`}
                 name={`lines.${props.index}.usage`}
-                type="switch"
             />
             <ErrorMessage
                 name={`lines.${props.index}.usage`}
