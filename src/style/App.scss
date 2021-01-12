@@ -2,3 +2,21 @@
 @import "~bootstrap-icons/font/bootstrap-icons.css";
 
 @import "DateRangePicker";
+
+.result-buttons {
+  @extend .d-flex;
+
+  & > * {
+    @extend .flex-shrink-0;
+
+    &:not(:last-child) {
+      @extend .mr-2;
+    }
+  }
+
+  &__permalink {
+    &__display {
+      @extend .flex-shrink-1;
+    }
+  }
+}
