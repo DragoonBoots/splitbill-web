@@ -87,7 +87,7 @@ export class Bill {
     }
 
     split(period, personPeriods, names) {
-        if (names.length === 0) {
+        if (names.size === 0) {
             return [];
         }
 
@@ -107,19 +107,19 @@ export class Bill {
         for (const day of periodDays) {
             let dayPartCount = 0;
             for (const personPeriod of personPeriods) {
-                if (personPeriod.period.contains(day)) {
+                if (personPeriod.period !== null && personPeriod.period.contains(day)) {
                     dayPartCount++;
                 }
             }
             if (dayPartCount === 0) {
-                dayPartCount = names.length;
+                dayPartCount = names.size;
                 everyoneUsageDays++;
             }
             dayParts.set(day, dayPartCount);
         }
 
         // Everyone will have this amount added to their usage portion to account for days when no one was present.
-        const everyoneUsageAmount = usagePart.div(names.length).times(everyoneUsageDays);
+        const everyoneUsageAmount = usagePart.div(names.size).times(everyoneUsageDays);
 
         // Second pass: divide the amount into chunks for each day, then divide those chunks into parts for
         // each user present on that day.  The end result of this is that presence on a given day costs a
@@ -130,7 +130,7 @@ export class Bill {
         }
 
         // Third pass: total each user's contribution.
-        const generalPortion = totals.generalTotal.div(names.length);
+        const generalPortion = totals.generalTotal.div(names.size);
         const portions = [];
         for (const person of names) {
             let usagePortion = new Big(0).plus(everyoneUsageAmount);
@@ -139,7 +139,7 @@ export class Bill {
                     continue;
                 }
                 for (const day of periodDays) {
-                    if (!personPeriod.period.contains(day)) {
+                    if (personPeriod.period === null || !personPeriod.period.contains(day)) {
                         continue;
                     }
                     usagePortion = usagePortion.plus(dayUsageAmounts.get(day));

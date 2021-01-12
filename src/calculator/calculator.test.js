@@ -59,9 +59,9 @@ test('Toted properly', () => {
 test('Split properly', () => {
     // Setup person periods
     const personPeriods = [];
-    const personNames = [];
+    const personNames = new Set();
     const personOneWeekName = "Person present one week";
-    personNames.push(personOneWeekName);
+    personNames.add(personOneWeekName);
     const personOneWeek = new PersonPeriod(personOneWeekName, Interval.fromDateTimes(
         DateTime.local(2020, 1, 8),
         DateTime.local(2020, 1, 14).plus({days: 1})
@@ -69,7 +69,7 @@ test('Split properly', () => {
     personPeriods.push(personOneWeek);
 
     const personTwoWeeksName = "Person present two weeks";
-    personNames.push(personTwoWeeksName);
+    personNames.add(personTwoWeeksName);
     const personTwoWeeks1 = new PersonPeriod(personTwoWeeksName, Interval.fromDateTimes(
         DateTime.local(2020, 1, 7),
         DateTime.local(2020, 1, 12).plus({days: 1})
@@ -80,7 +80,9 @@ test('Split properly', () => {
     ))
     personPeriods.push(personTwoWeeks1, personTwoWeeks2);
     const personAbsentName = "Person absent";
-    personNames.push(personAbsentName);
+    personNames.add(personAbsentName);
+    const personAbsent = new PersonPeriod(personAbsentName, null);
+    personPeriods.push(personAbsent);
 
     const results = bill.split(Interval.fromDateTimes(
         DateTime.local(2020, 1, 1),

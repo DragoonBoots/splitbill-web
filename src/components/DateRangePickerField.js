@@ -11,7 +11,6 @@ export function DatePickerField(props) {
         <DateRangePicker
             {...field}
             {...props}
-            value={field.value ?? Date.now()}
             onChange={val => setFieldValue(field.name, val)}
         />
     );

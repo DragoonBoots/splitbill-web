@@ -5,6 +5,7 @@
 
 .result-buttons {
   @extend .d-flex;
+  @extend .mb-3;
 
   & > * {
     @extend .flex-shrink-0;

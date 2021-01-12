@@ -12,6 +12,7 @@ function NameField(props) {
                 as={BsForm.Control}
                 name={`people.${props.index}.name`}
                 type="text"
+                required
             />
             <ErrorMessage
                 name={`people.${props.index}.name`}
@@ -30,7 +31,7 @@ function DateRangeField(props) {
                 name={`people.${props.index}.dateRange`}
                 maxDate={DateTime.local().toJSDate()}
                 calendarIcon={<i className="bi-calendar-range-fill"/>}
-                clearIcon={null}
+                clearIcon={<i className="bi-x-square"/>}
             />
             <ErrorMessage
                 name={`people.${props.index}.start`}
@@ -42,41 +43,42 @@ function DateRangeField(props) {
 }
 
 export function PeopleForm(props) {
-    const people = props.values.people.map((person, index) => (
+const people = props.values.people.map((person, index) => (
         <tr key={index}>
-            <td>
-                <NameField index={index}/>
-            </td>
-            <td>
-                {/* Date range */}
-                <DateRangeField index={index}/>
-            </td>
-            <td>
-                {/* Actions */}
-                <FormTableActionButtons
-                    index={index}
-                    values={props.values.people}
-                    arrayHelpers={props.arrayHelpers}
-                />
-            </td>
-        </tr>
-    ));
-    return (
-        <div className="d-inline">
-            <Table striped bordered hover>
-                <thead>
-                <tr>
-                    <th scope="col">Name</th>
-                    <th scope="col">Date Range</th>
-                    <th scope="col"><span className="sr-only">Actions</span></th>
-                </tr>
-                </thead>
-                <tbody>
-                {people}
-                </tbody>
-            </Table>
-        </div>
-    );
+        <td>
+            <NameField index={index}/>
+        </td>
+        <td>
+            {/* Date range */}
+            <DateRangeField index={index}/>
+        </td>
+        <td>
+            {/* Actions */}
+            <FormTableActionButtons
+                index={index}
+                values={props.values.people}
+                arrayHelpers={props.arrayHelpers}
+            />
+        </td>
+</tr>
+))
+;
+return (
+    <div className="d-inline">
+        <Table striped bordered hover>
+            <thead>
+            <tr>
+                <th scope="col">Name</th>
+                <th scope="col">Date Range</th>
+                <th scope="col"><span className="sr-only">Actions</span></th>
+            </tr>
+            </thead>
+            <tbody>
+            {people}
+            </tbody>
+        </Table>
+    </div>
+);
 }
 
 export default PeopleForm;

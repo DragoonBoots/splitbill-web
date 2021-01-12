@@ -26,6 +26,10 @@
   }
 
   &__button {
+    &:not(:last-child) {
+      @extend .mr-2;
+    }
+
     color: $input-color;
     padding: 0;
   }

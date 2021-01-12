@@ -8,6 +8,7 @@ import PeopleForm from "./PeopleForm";
 import {Bill, BillLine, PersonPeriod} from "./calculator/calculator";
 import Big from "big.js";
 import DateRangePicker from "./components/DateRangePickerField";
+import ResultsTable from "./ResultsTable";
 
 const defaultValues = {
     bill: {
@@ -41,15 +42,31 @@ const defaultValues = {
 class Permalink {
     static _paramName = 'data';
 
+    static _dateFromISO(isoDate) {
+        if (isoDate === null) {
+            return isoDate;
+        }
+        return DateTime.fromISO(isoDate);
+    }
+
     static toValues(url) {
         const data = url.searchParams.get(Permalink._paramName);
         if (data === null) {
             return null;
         }
         try {
-            return JSON.parse(data);
+            const values = JSON.parse(data);
+            // Convert the ISO datetimes into objects
+            values.bill.dateRange = values.bill.dateRange.map(this._dateFromISO);
+            for (const person of values.people) {
+                if (person.dateRange !== null) {
+                    person.dateRange = person.dateRange.map(this._dateFromISO);
+                }
+            }
+
+            return values;
         } catch (e) {
-            alert("The permalink contains invalid data.  Default data has been loaded.");
+            // Malformed data
             return null;
         }
     }
@@ -72,12 +89,14 @@ class App extends React.Component {
     constructor(props) {
         super(props);
 
+        this.state = {results: []};
+
         this.handleCalculate = this.handleCalculate.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handlePermalink = this.handlePermalink.bind(this);
     }
 
-    handleCalculate(values, formikBag) {
+    handleCalculate(values) {
         const bill = new Bill();
         for (const line of values.lines) {
             const billLine = new BillLine();
@@ -87,22 +106,31 @@ class App extends React.Component {
             billLine.split = line.usage;
             bill.lines.push(billLine);
         }
-        const personNames = [];
+        const personNames = new Set();
         const personPeriods = [];
         for (const person of values.people) {
-            personNames.push(person.name);
-            personPeriods.push(new PersonPeriod(person.name, Interval.fromDateTimes(
-                person.dateRange[0],
-                person.dateRange[1]
-            )));
+            personNames.add(person.name);
+            let interval = null;
+            if (person.dateRange !== null) {
+                if (Array.isArray(person.dateRange)) {
+                    interval = Interval.fromDateTimes(
+                        person.dateRange[0],
+                        person.dateRange[1]
+                    );
+                } else {
+                    interval = Interval.after(person.dateRange, {days: 1});
+                }
+            }
+            personPeriods.push(new PersonPeriod(person.name, interval));
         }
-        const split = bill.split(Interval.fromDateTimes(
+        const results = bill.split(Interval.fromDateTimes(
             values.bill.dateRange[0],
             values.bill.dateRange[1]
         ), personPeriods, personNames);
+        this.setState({results: results});
     }
 
-    handlePermalink(values, formikBag) {
+    handlePermalink(values) {
         const permalink = Permalink.fromValues(values);
         const permalinkDisplay = document.getElementById('permalink-display');
         permalinkDisplay.getElementsByTagName('input')[0].value = permalink.toString();
@@ -228,6 +256,7 @@ class App extends React.Component {
                                                     </InputGroup.Append>
                                                 </InputGroup>
                                             </div>
+                                            <ResultsTable portions={this.state.results}/>
                                         </Col>
                                     </Row>
                                 </Form>
