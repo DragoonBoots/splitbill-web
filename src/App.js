@@ -1,5 +1,5 @@
 import './style/App.scss';
-import {Button, Col, Container, Form as BsForm, InputGroup, Navbar, Row} from "react-bootstrap";
+import {Alert, Button, Col, Container, Form as BsForm, InputGroup, Navbar, Row} from "react-bootstrap";
 import BillLinesForm from "./BillLinesForm";
 import React from "react";
 import {Field, FieldArray, Form, Formik} from "formik";
@@ -89,24 +89,19 @@ class App extends React.Component {
     constructor(props) {
         super(props);
 
-        this.state = {results: []};
+        this.state = {
+            bill: new Bill(),
+            results: [],
+        };
 
         this.handleCalculate = this.handleCalculate.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handlePermalink = this.handlePermalink.bind(this);
+        this.validate = this.validate.bind(this);
     }
 
     handleCalculate(values) {
-        const bill = new Bill();
-        bill.totalAmount = new Big(values.bill.total);
-        for (const line of values.lines) {
-            const billLine = new BillLine();
-            billLine.name = line.name;
-            billLine.amount = new Big(line.amount);
-            billLine.taxRate = line.tax / 100.0;
-            billLine.split = line.usage;
-            bill.lines.push(billLine);
-        }
+        const bill = this.createBill(values);
         const personNames = new Set();
         const personPeriods = [];
         for (const person of values.people) {
@@ -158,6 +153,32 @@ class App extends React.Component {
         formikBag.setSubmitting(false);
     }
 
+    validate(values) {
+        const errors = {};
+        const bill = this.createBill(values);
+        const billError = bill.valid();
+        if (billError.length > 0) {
+            errors.lines = billError;
+        }
+
+        return errors;
+    }
+
+    createBill(values) {
+        const bill = new Bill();
+        bill.totalAmount = new Big(values.bill.total);
+        for (const line of values.lines) {
+            const billLine = new BillLine();
+            billLine.name = line.name;
+            billLine.amount = new Big(line.amount);
+            billLine.taxRate = line.tax / 100.0;
+            billLine.split = line.usage;
+            bill.lines.push(billLine);
+        }
+
+        return bill;
+    }
+
     render() {
         const initialValues = Permalink.toValues(new URL(document.location)) ?? defaultValues;
         initialValues['_submitButton'] = '';
@@ -170,6 +191,7 @@ class App extends React.Component {
                 <Container>
                     <Formik
                         initialValues={initialValues}
+                        validate={this.validate}
                         onSubmit={this.handleSubmit}
                     >
                         {formikProps => (
@@ -227,6 +249,8 @@ class App extends React.Component {
                                                                    arrayHelpers={arrayHelpers}/>
                                                 )}
                                             </FieldArray>
+                                            {formikProps.errors.lines &&
+                                            <Alert variant="danger">{formikProps.errors.lines}</Alert>}
                                         </Col>
                                     </Row>
                                     <Row>
@@ -235,7 +259,7 @@ class App extends React.Component {
                                             <div className="result-buttons">
                                                 <Button className="result-buttons__calculate" variant="primary"
                                                         type="submit"
-                                                        disabled={formikProps.isSubmitting}
+                                                        disabled={formikProps.isSubmitting || formikProps.isValidating || !formikProps.isValid}
                                                         onClick={() => formikProps.setFieldValue('_submitButton', 'calculate')}>
                                                     Calculate
                                                 </Button>
