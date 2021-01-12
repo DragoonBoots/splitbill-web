@@ -102,23 +102,7 @@ class App extends React.Component {
 
     handleCalculate(values) {
         const bill = this.createBill(values);
-        const personNames = new Set();
-        const personPeriods = [];
-        for (const person of values.people) {
-            personNames.add(person.name);
-            let interval = null;
-            if (person.dateRange !== null) {
-                if (Array.isArray(person.dateRange)) {
-                    interval = Interval.fromDateTimes(
-                        person.dateRange[0],
-                        person.dateRange[1]
-                    );
-                } else {
-                    interval = Interval.after(person.dateRange, {days: 1});
-                }
-            }
-            personPeriods.push(new PersonPeriod(person.name, interval));
-        }
+        const [personNames, personPeriods] = this.createPeople(values);
         const results = bill.split(Interval.fromDateTimes(
             values.bill.dateRange[0],
             values.bill.dateRange[1]
@@ -155,10 +139,28 @@ class App extends React.Component {
 
     validate(values) {
         const errors = {};
+
+        // General bill validation
         const bill = this.createBill(values);
         const billError = bill.valid();
         if (billError.length > 0) {
             errors.lines = billError;
+        }
+
+        // Ensure people are sane
+        const billPeriod = Interval.fromDateTimes(
+            values.bill.dateRange[0],
+            values.bill.dateRange[1]
+        )
+        for (const personValues of values.people) {
+            if (personValues.dateRange === null) {
+                continue;
+            }
+            const period = Interval.fromDateTimes(personValues.dateRange[0], personValues.dateRange[1]);
+            if (!billPeriod.engulfs(period)) {
+                errors.people = personValues.name + " has dates outside the bill date range.";
+                break;
+            }
         }
 
         return errors;
@@ -177,6 +179,28 @@ class App extends React.Component {
         }
 
         return bill;
+    }
+
+    createPeople(values) {
+        const personNames = new Set();
+        const personPeriods = [];
+        for (const person of values.people) {
+            personNames.add(person.name);
+            let interval = null;
+            if (person.dateRange !== null) {
+                if (Array.isArray(person.dateRange)) {
+                    interval = Interval.fromDateTimes(
+                        person.dateRange[0],
+                        person.dateRange[1]
+                    );
+                } else {
+                    interval = Interval.after(person.dateRange, {days: 1});
+                }
+            }
+            personPeriods.push(new PersonPeriod(person.name, interval));
+        }
+
+        return [personNames, personPeriods];
     }
 
     render() {
@@ -238,6 +262,8 @@ class App extends React.Component {
                                                                 arrayHelpers={arrayHelpers}/>
                                                 )}
                                             </FieldArray>
+                                            {formikProps.errors.people &&
+                                            <Alert variant="danger">{formikProps.errors.people}</Alert>}
                                         </Col>
                                     </Row>
                                     <Row>
