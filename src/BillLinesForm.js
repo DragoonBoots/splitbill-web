@@ -115,22 +115,20 @@ export function BillLinesForm(props) {
         </tr>
     ));
     return (
-        <div className="d-inline">
-            <Table striped bordered hover>
-                <thead>
-                <tr>
-                    <th scope="col">Name</th>
-                    <th scope="col">Amount</th>
-                    <th scope="col">Tax</th>
-                    <th scope="col">Usage</th>
-                    <th scope="col"><span className="sr-only">Actions</span></th>
-                </tr>
-                </thead>
-                <tbody>
-                {lines}
-                </tbody>
-            </Table>
-        </div>
+        <Table striped bordered hover>
+            <thead>
+            <tr>
+                <th scope="col">Name</th>
+                <th scope="col">Amount</th>
+                <th scope="col">Tax</th>
+                <th scope="col">Usage</th>
+                <th scope="col"><span className="sr-only">Actions</span></th>
+            </tr>
+            </thead>
+            <tbody>
+            {lines}
+            </tbody>
+        </Table>
     );
 }
 

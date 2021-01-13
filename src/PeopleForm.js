@@ -43,28 +43,26 @@ function DateRangeField(props) {
 }
 
 export function PeopleForm(props) {
-const people = props.values.people.map((person, index) => (
+    const people = props.values.people.map((person, index) => (
         <tr key={index}>
-        <td>
-            <NameField index={index}/>
-        </td>
-        <td>
-            {/* Date range */}
-            <DateRangeField index={index}/>
-        </td>
-        <td>
-            {/* Actions */}
-            <FormTableActionButtons
-                index={index}
-                values={props.values.people}
-                arrayHelpers={props.arrayHelpers}
-            />
-        </td>
-</tr>
-))
-;
-return (
-    <div className="d-inline">
+            <td>
+                <NameField index={index}/>
+            </td>
+            <td>
+                {/* Date range */}
+                <DateRangeField index={index}/>
+            </td>
+            <td>
+                {/* Actions */}
+                <FormTableActionButtons
+                    index={index}
+                    values={props.values.people}
+                    arrayHelpers={props.arrayHelpers}
+                />
+            </td>
+        </tr>
+    ));
+    return (
         <Table striped bordered hover>
             <thead>
             <tr>
@@ -77,8 +75,7 @@ return (
             {people}
             </tbody>
         </Table>
-    </div>
-);
+    );
 }
 
 export default PeopleForm;

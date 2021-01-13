@@ -216,7 +216,7 @@ class App extends React.Component {
                         Split Bill
                     </Navbar.Brand>
                 </Navbar>
-                <Container>
+                <Container fluid="md">
                     <Formik
                         initialValues={initialValues}
                         validate={this.validate}
