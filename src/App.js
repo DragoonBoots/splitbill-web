@@ -229,31 +229,35 @@ class App extends React.Component {
                                         <Col>
                                             <h1>Bill</h1>
                                             <BsForm.Row>
-                                                <BsForm.Group as={Col} controlId="bill.total">
-                                                    <BsForm.Label>Total</BsForm.Label>
-                                                    <InputGroup>
-                                                        <InputGroup.Prepend>
-                                                            <InputGroup.Text>$</InputGroup.Text>
-                                                        </InputGroup.Prepend>
+                                                <Col>
+                                                    <BsForm.Group controlId="bill.total">
+                                                        <BsForm.Label>Total</BsForm.Label>
+                                                        <InputGroup>
+                                                            <InputGroup.Prepend>
+                                                                <InputGroup.Text>$</InputGroup.Text>
+                                                            </InputGroup.Prepend>
+                                                            <Field
+                                                                as={BsForm.Control}
+                                                                name="bill.total"
+                                                                type="number"
+                                                                min="0"
+                                                                step="0.01"
+                                                            />
+                                                        </InputGroup>
+                                                    </BsForm.Group>
+                                                </Col>
+                                                <Col sm="auto">
+                                                    <BsForm.Group controlId="bill.dateRange">
+                                                        <BsForm.Label>Date Range</BsForm.Label>
                                                         <Field
-                                                            as={BsForm.Control}
-                                                            name="bill.total"
-                                                            type="number"
-                                                            min="0"
-                                                            step="0.01"
+                                                            as={DateRangePicker}
+                                                            name="bill.dateRange"
+                                                            maxDate={DateTime.local().toJSDate()}
+                                                            calendarIcon={<i className="bi-calendar-range-fill"/>}
+                                                            clearIcon={null}
                                                         />
-                                                    </InputGroup>
-                                                </BsForm.Group>
-                                                <BsForm.Group as={Col} controlId="bill.dateRange">
-                                                    <BsForm.Label>Date Range</BsForm.Label>
-                                                    <Field
-                                                        as={DateRangePicker}
-                                                        name="bill.dateRange"
-                                                        maxDate={DateTime.local().toJSDate()}
-                                                        calendarIcon={<i className="bi-calendar-range-fill"/>}
-                                                        clearIcon={null}
-                                                    />
-                                                </BsForm.Group>
+                                                    </BsForm.Group>
+                                                </Col>
                                             </BsForm.Row>
                                         </Col>
                                     </Row>
