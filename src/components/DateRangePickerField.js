@@ -46,7 +46,7 @@ export function DatePickerField(props) {
                 <InputGroup>
                     <BsForm.Control
                         type="date"
-                        value={startDate}
+                        value={startDate ?? ""}
                         min={minDate}
                         max={endDate}
                         onChange={e => {
@@ -56,7 +56,7 @@ export function DatePickerField(props) {
                     />
                     <BsForm.Control
                         type="date"
-                        value={endDate}
+                        value={endDate ?? ""}
                         min={startDate}
                         max={maxDate}
                         onChange={e => {

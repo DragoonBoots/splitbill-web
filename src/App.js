@@ -47,7 +47,7 @@ class Permalink {
         if (isoDate === null) {
             return isoDate;
         }
-        return DateTime.fromISO(isoDate);
+        return DateTime.fromISO(isoDate).toJSDate();
     }
 
     static toValues(url) {
