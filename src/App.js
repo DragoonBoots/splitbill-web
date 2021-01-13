@@ -9,6 +9,7 @@ import {Bill, BillLine, PersonPeriod} from "./calculator/calculator";
 import Big from "big.js";
 import DateRangePicker from "./components/DateRangePickerField";
 import ResultsTable from "./ResultsTable";
+import logo from "./app-icon.svg";
 
 const defaultValues = {
     bill: {
@@ -210,7 +211,10 @@ class App extends React.Component {
         return (
             <div>
                 <Navbar bg="dark" variant="dark">
-                    <Navbar.Brand>Split Bill</Navbar.Brand>
+                    <Navbar.Brand>
+                        <img alt="" src={logo} width="30" height="30" className="d-inline-block align-top"/>{' '}
+                        Split Bill
+                    </Navbar.Brand>
                 </Navbar>
                 <Container>
                     <Formik

@@ -1,0 +1,58 @@
+name: CI
+
+on:
+  push: ~
+  pull_request: ~
+  workflow_dispatch: ~
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Get Yarn cache dir
+        id: cache_dir
+        run: echo "::set-output name=yarn::$(yarn cache dir)"
+      - name: Cache node modules
+        uses: actions/cache@v2
+        env:
+          CACHE_NAME: yarn
+        with:
+          path: ${{ steps.cache_dir.outputs.yarn }}
+          key: ${{ runner.os }}-${{ github.job }}-${{ env.CACHE_NAME }}-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ github.job }}-${{ env.CACHE_NAME }}-
+            ${{ runner.os }}-${{ github.job }}-
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile --production --non-interactive
+      - name: Run tests
+        uses: mattallty/jest-github-action@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          test-command: yarn test
+          coverage-comment: false
+      - name: Build site
+        run: yarn build
+      - name: Store build results
+        uses: actions/upload-artifact@v2
+        with:
+          name: site
+          path: build
+
+  pages:
+    runs-on: ubuntu-latest
+    if: ${{github.ref == 'refs/heads/master'}}
+    needs:
+      - build
+    steps:
+      - name: Download built site
+        uses: actions/download-artifact@v2
+        with:
+          name: site
+          path: public
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ${{ github.workspace }}/public

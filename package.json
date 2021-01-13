@@ -22,11 +22,16 @@
     "sass": "^1.32.2",
     "web-vitals": "^0.2.4"
   },
+  "devDependencies": {
+    "cli-real-favicon": "^0.0.8",
+    "serve": "^11.3.2"
+  },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "jest",
-    "eject": "react-scripts eject"
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
+    "favicons": "real-favicon generate faviconDescription.json faviconData.json public"
   },
   "eslintConfig": {
     "extends": [
