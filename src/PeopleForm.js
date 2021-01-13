@@ -1,9 +1,10 @@
 import React from 'react';
-import {Accordion, Button, Card, Form as BsForm, Table} from "react-bootstrap";
+import {Accordion, Card, Form as BsForm, Table} from "react-bootstrap";
 import {ErrorMessage, Field} from 'formik';
 import FormTableActionButtons from "./components/FormTableActionButtons";
 import {DateTime} from "luxon";
 import DateRangePicker from "./components/DateRangePickerField"
+import SmallFormAccordionToggle from "./components/SmallFormAccordionToggle";
 
 function NameField(props) {
     const controlId = `people.${props.index}.name`;
@@ -50,9 +51,9 @@ function PeopleFormSm(props) {
     const people = props.values.people.map((person, index) => (
         <Card key={index}>
             <Card.Header className="d-flex justify-content-between">
-                <Accordion.Toggle as={Button} variant="link" eventKey={`people.${index}`}>
+                <SmallFormAccordionToggle eventKey={`people.${index}`}>
                     {person.name.length === 0 ? <em>Unnamed</em> : person.name}
-                </Accordion.Toggle>
+                </SmallFormAccordionToggle>
                 <FormTableActionButtons
                     index={index}
                     values={props.values.people}
