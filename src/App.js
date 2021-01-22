@@ -16,8 +16,8 @@ const defaultValues = {
         total: 0,
         dateRange: [
             // Initialize to a range starting 1 month prior to today
-            DateTime.local().minus({months: 1}).toJSDate(),
-            DateTime.local().toJSDate()
+            DateTime.local().startOf('day').minus({months: 1}).toJSDate(),
+            DateTime.local().endOf('day').toJSDate()
         ],
     },
     lines: [
@@ -33,8 +33,8 @@ const defaultValues = {
             name: '',
             dateRange: [
                 // Initialize to a range starting 1 month prior to today
-                DateTime.local().minus({months: 1}).toJSDate(),
-                DateTime.local().toJSDate()
+                DateTime.local().startOf('day').minus({months: 1}).toJSDate(),
+                DateTime.local().endOf('day').toJSDate()
             ]
         },
     ],
@@ -159,7 +159,8 @@ class App extends React.Component {
             }
             const period = Interval.fromDateTimes(personValues.dateRange[0], personValues.dateRange[1]);
             if (!billPeriod.engulfs(period)) {
-                errors.people = personValues.name + " has dates outside the bill date range.";
+                errors.people = (personValues.name.length === 0 ? "Unnamed person" : personValues.name)
+                    + " has dates outside the bill date range.";
                 break;
             }
         }
@@ -206,6 +207,7 @@ class App extends React.Component {
 
     render() {
         const initialValues = Permalink.toValues(new URL(document.location)) ?? defaultValues;
+        // Ensure even values from permalink has a button set
         initialValues['_submitButton'] = '';
 
         return (
